@@ -1,0 +1,82 @@
+Define constants:
+    MAX_TICKETS_VIP = 50
+    MAX_TICKETS_SECOND_CLASS = 150
+    MAX_TICKETS_NORMAL = 300
+
+Define structure Ticket:
+    name: string
+    telephone: string
+    category: integer (1 for VIP, 2 for Second Class, 3 for Normal)
+    ticket_number: integer
+
+Define global variables:
+    tickets: array of Ticket objects
+    num_tickets_sold: integer
+
+Function display_available_tickets():
+    Display "Available tickets:"
+    Display "VIP: " + (MAX_TICKETS_VIP - count_tickets_sold(1))
+    Display "Second Class: " + (MAX_TICKETS_SECOND_CLASS - count_tickets_sold(2))
+    Display "Normal: " + (MAX_TICKETS_NORMAL - count_tickets_sold(3))
+
+Function count_tickets_sold(category):
+    count = 0
+    For each ticket in tickets:
+        If ticket's category matches the given category:
+            Increment count by 1
+    Return count
+
+Function book_ticket(name, telephone, category):
+    max_tickets = MAX_TICKETS_VIP (or SECOND_CLASS or NORMAL) based on category
+    If count_tickets_sold(category) < max_tickets:
+        Create a new Ticket object with provided name, telephone, category, and ticket number
+        Add the new Ticket object to the tickets array
+        Increment num_tickets_sold by 1
+        Display "Ticket booked successfully!"
+    Else:
+        Display "Sorry, all tickets of this category are sold out!"
+
+Function update_details(ticket_number, new_name, new_telephone):
+    For each ticket in tickets:
+        If ticket's ticket_number matches the given ticket_number:
+            Update ticket's name and telephone with new_name and new_telephone
+            Display "Details updated successfully!"
+            Return
+    Display "Ticket number not found!"
+
+Function delete_booking(ticket_number):
+    For each ticket in tickets:
+        If ticket's ticket_number matches the given ticket_number:
+            Remove the ticket from tickets array
+            Decrement num_tickets_sold by 1
+            Display "Booking deleted successfully!"
+            Return
+    Display "Ticket number not found!"
+
+Function save_data_to_file():
+    Open a file named "tickets.txt" for writing
+    For each ticket in tickets:
+        Write ticket's details (name, telephone, category, ticket_number) to the file
+    Close the file
+    Display "Data saved to file."
+
+Function display_booked_tickets():
+    Display "Booked tickets:"
+    For each ticket in tickets:
+        Display ticket's details (ticket_number, name, telephone, category)
+
+Function main():
+    Display "Welcome to Kuweni Concert 2024 Tickets Booking System"
+    Loop:
+        Display menu options
+        Prompt user for choice
+        Switch choice:
+            Case 1: display_available_tickets()
+            Case 2: prompt user for name, telephone, and category; book_ticket(name, telephone, category)
+            Case 3: prompt user for ticket_number, new_name, and new_telephone; update_details(ticket_number, new_name, new_telephone)
+            Case 4: prompt user for ticket_number; delete_booking(ticket_number)
+            Case 5: display_booked_tickets()
+            Case 6: save_data_to_file(); Display "Data saved to file. Exiting program."; Exit loop
+            Default: Display "Invalid choice!"
+    End loop
+    Return 0
