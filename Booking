@@ -1,0 +1,207 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h> /*used to include the string manipulation functions 
+                      such as strcpy() and strcmp() */
+
+
+// User Defined Variables as I get VIP seats 50 and Second Class seats 150 and Normal 300
+#define MAX_TICKETS_VIP 50
+#define MAX_TICKETS_SECOND_CLASS 150
+#define MAX_TICKETS_NORMAL 300
+
+
+// The typedef struct declaration is used to define a new data type named Ticket
+typedef struct {
+    char name[50];
+    char telephone[15];
+    int category; 
+// 1 for VIP, 2 for Second Class, 3 for Normal
+    int ticket_number;
+} Ticket;
+
+/* creates an array named tickets capable of holding a total number of tickets equal to 
+the sum of the maximum allowed tickets for VIP, second class, and normal categories.*/
+
+Ticket tickets[MAX_TICKETS_VIP + MAX_TICKETS_SECOND_CLASS + MAX_TICKETS_NORMAL];
+int num_tickets_sold = 0;
+
+
+// Function for the display available tickets
+
+void display_available_tickets() {
+    printf("Available tickets:\n");
+    printf("VIP: %d\n", MAX_TICKETS_VIP - count_tickets_sold(1));
+    printf("Second Class: %d\n", MAX_TICKETS_SECOND_CLASS - count_tickets_sold(2));
+    printf("Normal: %d\n", MAX_TICKETS_NORMAL - count_tickets_sold(3));
+}
+
+// Function for counting available tickets
+
+int count_tickets_sold(int category) {
+    int count = 0;
+    for (int i = 0; i < num_tickets_sold; i++) {
+        if (tickets[i].category == category) {
+            count++;
+        }
+    }
+    return count;
+}
+
+// Function for ticket booking
+
+void book_ticket(char name[], char telephone[], int category) {
+    int max_tickets;
+    switch (category) {
+        case 1:
+            max_tickets = MAX_TICKETS_VIP;
+            break;
+        case 2:
+            max_tickets = MAX_TICKETS_SECOND_CLASS;
+            break;
+        case 3:
+            max_tickets = MAX_TICKETS_NORMAL;
+            break;
+        default:
+            printf("Invalid ticket category!\n");
+            return;
+    }
+
+    if (count_tickets_sold(category) < max_tickets) {
+        strncpy(tickets[num_tickets_sold].name, name, sizeof(tickets[num_tickets_sold].name) - 1);
+        strncpy(tickets[num_tickets_sold].telephone, telephone, sizeof(tickets[num_tickets_sold].telephone) - 1);
+        tickets[num_tickets_sold].category = category;
+        tickets[num_tickets_sold].ticket_number = (category * 1000) + count_tickets_sold(category) + 1; // Example: VIP1, Second Class1, etc.
+        num_tickets_sold++;
+        printf("Ticket booked successfully!\n");
+    } else {
+        printf("Sorry, all tickets of this category are sold out!\n");
+    }
+}
+
+// Function for update details
+
+void update_details(int ticket_number, char new_name[], char new_telephone[]) {
+    for (int i = 0; i < num_tickets_sold; i++) {
+        if (tickets[i].ticket_number == ticket_number) {
+            strncpy(tickets[i].name, new_name, sizeof(tickets[i].name) - 1);  /* The strncpy function is used to copy strings in C.
+                                                                                It stands for "string copy, with a maximum length"*/
+            strncpy(tickets[i].telephone, new_telephone, sizeof(tickets[i].telephone) - 1);
+            printf("Details updated successfully!\n");
+            return;
+        }
+    }
+    printf("Ticket number not found!\n");
+}
+
+// Function for delete booking
+
+void delete_booking(int ticket_number) {
+    for (int i = 0; i < num_tickets_sold; i++) {
+        if (tickets[i].ticket_number == ticket_number) {
+            for (int j = i; j < num_tickets_sold - 1; j++) {
+                tickets[j] = tickets[j + 1];
+            }
+            num_tickets_sold--;
+            printf("Booking deleted successfully!\n");
+            return;
+        }
+    }
+    printf("Ticket number not found!\n");
+}
+
+// Function for save file
+
+void save_data_to_file() {
+    FILE *fp = fopen("tickets.txt", "w");
+    if (fp == NULL) {
+        printf("Error opening file!\n");
+        return;
+    }
+    for (int i = 0; i < num_tickets_sold; i++) {
+        fprintf(fp, "%s %s %d %d\n", tickets[i].name, tickets[i].telephone, tickets[i].category, tickets[i].ticket_number);
+    }
+    fclose(fp);
+}
+
+//Function for display booked tickets
+
+void display_booked_tickets() {
+    printf("\nBooked tickets:\n");
+    printf("Ticket No\tName\tTelephone\tCategory\n");
+    for (int i = 0; i < num_tickets_sold; i++) {
+        printf("%d\t\t%s\t%s\t\t", tickets[i].ticket_number, tickets[i].name, tickets[i].telephone);
+        switch (tickets[i].category) {
+            case 1:
+                printf("VIP\n");
+                break;
+            case 2:
+                printf("Second Class\n");
+                break;
+            case 3:
+                printf("Normal\n");
+                break;
+            default:
+                printf("Unknown\n");
+        }
+    }
+}
+
+// main method
+
+int main() {
+    int choice;
+    char name[50], telephone[15];
+    int category, ticket_number;
+    char new_name[50], new_telephone[15];
+    printf("----------------Welcome to Kuweni Concert 2024 Tickets Booking System------------------\n");
+    do {
+        printf("\n1. Display available tickets\n");
+        printf("2. Book a ticket\n");
+        printf("3. Update ticket details\n");
+        printf("4. Delete booking\n");
+        printf("5. Display booked tickets\n");
+        printf("6. Exit program\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                display_available_tickets();
+                break;
+            case 2:
+                printf("Enter your name: ");
+                scanf("%s", name);
+                printf("Enter your telephone number: ");
+                scanf("%s", telephone);
+                printf("Select ticket category (1 for VIP, 2 for Second Class, 3 for Normal): ");
+                scanf("%d", &category);
+                book_ticket(name, telephone, category);
+                break;
+            case 3:
+                printf("Enter your ticket number: ");
+                scanf("%d", &ticket_number);
+                printf("Enter new name: ");
+                scanf("%s", new_name);
+                printf("Enter new telephone number: ");
+                scanf("%s", new_telephone);
+                update_details(ticket_number, new_name, new_telephone);
+                break;
+            case 4:
+                printf("Enter ticket number to delete: ");
+                scanf("%d", &ticket_number);
+                delete_booking(ticket_number);
+                break;
+            case 5:
+                display_booked_tickets();
+                break;
+            case 6:
+                save_data_to_file();
+                printf("Data saved to file. Exiting program.\n");
+                exit(0);
+            default:
+                printf("Invalid choice!\n");
+        }
+    } while (choice != 6);
+
+    return 0;
+}
